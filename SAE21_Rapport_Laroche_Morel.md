@@ -210,7 +210,7 @@ VBoxManage controlvm "%VMName%" acpipowerbutton
 ```
 Pour éteindre de manière plus sécuriser la machine, mais lors des test la commande n'a pas fonctionné.
 
-#SAE51 - Ajout de fonctionnalités
+# SAE51 - Ajout de fonctionnalités
 
 ## Réalisé par :
 LAROCHE Léo  
