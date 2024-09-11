@@ -3,8 +3,8 @@
 
 
 ## Réalisé par :
-Laroche Léo  
-Morel Robin  
+LAROCHE Léo  
+MOREL Robin  
 
 
 **Date de remise : 22/06/2023**
@@ -210,3 +210,15 @@ VBoxManage controlvm "%VMName%" acpipowerbutton
 ```
 Pour éteindre de manière plus sécuriser la machine, mais lors des test la commande n'a pas fonctionné.
 
+#SAE51 - Ajout de fonctionnalités
+
+## Réalisé par :
+LAROCHE Léo  
+MOREL Robin  
+
+
+**Date de remise : XX/XX/20XX**
+
+---
+
+### Objectif :
