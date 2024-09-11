@@ -232,3 +232,5 @@ Repartir de ce projet existant pour lui ajouter des fonctionnalités
 
 - Ajout d'une interface graphique
   - Problème : Le projet avait pour but de se débarrasser de l'interface graphique de Virtual Box pour gagner du temps, mais si on veut absolument utiliser une interface graphique autant utiliser directement Virtual Box
+
+- Ajout de l'allocation de ressource dans les arguments pour pouvoir allouer plus ou moins de ressources si nécessaire, tout en gardant la RAM à 4096 o et le stockage à 64 Go si les arguments restent vides.
