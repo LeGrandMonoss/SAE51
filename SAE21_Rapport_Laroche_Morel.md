@@ -230,5 +230,5 @@ Repartir de ce projet existant pour lui ajouter des fonctionnalités
 - Ajout d'un choix d'os qui ajoute directement l'iso correspondant
       Problème: Lors du projet nous avons paramétré pour que les vm se lancent en pxe donc cette solution n'a pas d'intérêt
 
-  - Ajout d'une interface graphique
+- Ajout d'une interface graphique
       Problème : Le projet avait pour but de se débarrasser de l'interface graphique de Virtual Box pour gagner du temps, mais si on veut absolument utiliser une interface graphique autant utiliser directement Virtual Box
