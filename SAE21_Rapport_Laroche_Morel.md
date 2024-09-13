@@ -237,6 +237,6 @@ Lors de ce projet, nous avons dû mettre en place un script permettant, via Vbox
 
 - Rajouter une vérification pour supprimation une VM (voir aussi plus tard pour demander lors de l'arrêt d'une VM)
 
-- Rajout couleurs
+
 
 
