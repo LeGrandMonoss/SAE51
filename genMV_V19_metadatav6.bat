@@ -148,7 +148,7 @@ if /i "%~1"=="A" (
         exit /b 1
     )
     echo Arrêt de la machine %VM_NAME%...
-    VBoxManage controlvm %VM_NAME% acpipowerbutton
+    VBoxManage controlvm %VM_NAME% poweroff
 )
 
 pause
