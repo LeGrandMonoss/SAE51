@@ -223,7 +223,7 @@ MOREL Robin
 
 ### Objectif :
 
-Repartir de ce projet existant pour lui ajouter des fonctionnalités
+Lors de ce projet, nous avons dû mettre en place un script permettant, via VboxManage, de créer des machines virtuelles, de les démarrer, les supprimer, les lister, les éteindre, ainsi que d'ajouter des fonctionnalités non intégrées précédemment. Nous avons choisi de recommencer le projet à zéro afin de nous replonger dedans et de corriger éventuellement des erreurs.
 
 ### Idées d'ajout :
 
