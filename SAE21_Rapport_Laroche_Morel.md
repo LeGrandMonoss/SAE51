@@ -238,5 +238,206 @@ Lors de ce projet, nous avons dû mettre en place un script permettant, via Vbox
 - Rajouter une vérification pour supprimation une VM (voir aussi plus tard pour demander lors de l'arrêt d'une VM)
 
 
+### Ce qui à était fait :
 
+##### Mise en place du code
+```
+@echo off  
+setlocal enabledelayedexpansion         
 
+REM On force l'encodage en UTF-8 pour éviter les problèmes de caractères spéciaux
+chcp 65001 >nul
+```
+Dans les premières lignes, nous avons préparer notre code en le rendant plus lisible et plus agréable à utiliser avec les lignes ci-dessus. echo off va nous permettre de désactiver l'affichhge des lignes de commande pour avoir un environement plus clair. On utilise setlocal afin de manipuler plus efficacement les variables dans les boucles ou dans des conditions complexes. Vu que plustard nous utilisions du français dans des messages des retours et qui à des caractères spéciaux, on va utiliser la commande chcp qui permet de changer la page de code utilisée dans l'invite de commande, afin d'utiliser utf-8.
+
+#### Vérification des arguments 
+
+```
+REM Vérifier les arguments
+if "%~1"=="" (
+    echo Usage: %0 [L|N|S|D|A] [nom_VM]
+    echo L  - Lister les machines
+    echo N  - Créer une nouvelle machine
+    echo S  - Supprimer une machine
+    echo D  - Démarrer une machine
+    echo A  - Arrêter une machine
+    exit /b 
+)
+```
+Dans cette partie de code, on va vérifier si l'un des arugments est utiliser 
+
+#### Arguments valide 
+
+```
+REM Vérification si le premier argument n'est pas valide
+if /i not "%~1"=="L" if /i not "%~1"=="N" if /i not "%~1"=="S" if /i not "%~1"=="D" if /i not "%~1"=="A" (
+    echo Erreur : Argument non valide "%~1". Veuillez entrer une des options suivantes :
+    echo L  - Lister les machines
+    echo N  - Créer une nouvelle machine
+    echo S  - Supprimer une machine
+    echo D  - Démarrer une machine
+    echo A  - Arrêter une machine
+    exit /b 1
+)
+```
+Ce morceau de code permet de vérifier si l'argument qu'on a rentrer est bien dans la liste sinon on echo un message d'erreur. 
+ 
+#### Argument RAM
+
+```
+REM Vérifier et définir la RAM
+if "%~3" NEQ "" (
+    set "VM_RAM=%~3"
+) else (
+    set "VM_RAM=4096"
+)
+```
+Comme dit dans nos idées, on à rajouter la possibilté de choisir la RAM en tant qu'argument 
+
+#### Argument disque dur 
+
+```
+REM Vérifier et définir le disque dur
+if "%~4" NEQ "" (
+    set "VM_DU=%~4"
+) else (
+    set "VM_DU=65536"
+)
+```
+Pareil pour la RAM, on rajoute la possibilité de choisir la taille du disque mais en tant qu'argument
+
+#### User & date
+
+```
+REM Obtenir l'utilisateur et la date de création
+set "USER=%USERNAME%"
+for /f "tokens=1-3 delims=/ " %%a in ("%DATE%") do (
+    set "CREATION_DATE=%%c-%%a-%%b"
+)
+```
+Ce morceau, nous sert à récuperer le nom du user créateur d'une VM et sa date de création pour les métadonnées
+
+#### Argument L : Liste des VM 
+
+```
+REM Actions basées sur le premier argument
+if /i "%~1"=="L" (
+    echo Liste des machines créées dans VirtualBox :
+    echo ----------------------
+    VBoxManage list vms
+    echo ----------------------
+
+    REM Afficher les métadonnées pour chaque machine
+    for /f "tokens=1 delims={" %%i in ('VBoxManage list vms') do (
+        set "vm_name=%%i"
+        REM Nettoyer le nom de la VM en supprimant les guillemets et les espaces
+        set "vm_name=!vm_name:"=!"
+        set "vm_name=!vm_name: =!"
+
+        REM Chemin du fichier de métadonnées
+        set "vm_metadata_file=%VM_PATH%\!vm_name!\metadata.txt"
+        
+        REM Nettoyer les espaces dans le chemin du fichier de métadonnées
+        set "vm_metadata_file=!vm_metadata_file: =!"
+
+        REM Afficher le chemin des métadonnées pour diagnostic
+        REM echo Chemin vérifié pour les métadonnées : !vm_metadata_file!
+
+        if exist "!vm_metadata_file!" (
+            echo ----------------------
+            echo Métadonnées pour !vm_name!
+            type "!vm_metadata_file!"
+            echo ----------------------
+        ) else (
+            echo ----------------------
+            echo Aucune métadonnée trouvée pour !vm_name!.
+            echo ----------------------
+        )
+    )
+)
+```
+Ici, on défini l'argument L qui permettra de lister les VMs qu'on à créer et de montrer, les métadonnées liers à ces dernières. 
+
+#### Argument S : suppresion de VM 
+
+```
+if /i "%~1"=="S" (
+    if "%VM_NAME%"=="" (
+        echo Vous devez spécifier un nom de VM avec l'argument S.
+        exit /b 1
+    )
+    :check_response
+    set /p "response=Voulez-vous vraiment supprimer la VM %VM_NAME% ? (Oui/Non) : "
+
+    REM Convertir la réponse en majuscules pour comparaison facile
+    if /i "%response%"=="Oui" (
+        if "%VM_NAME%"=="" (
+            echo Vous devez spécifier un nom de VM avec l'argument S.
+            exit /b 1
+        )
+        echo Suppression de la machine %VM_NAME%...
+        VBoxManage unregistervm %VM_NAME% --delete
+        echo La machine %VM_NAME% a été supprimée !
+        exit /b 0
+    ) else if /i "%response%"=="Non" (
+        echo Annulation de la suppression de la VM %VM_NAME%.
+        exit /b 0
+    ) else (
+        echo Réponse non valide. Veuillez entrer Oui ou Non.
+        goto check_response
+    )
+)
+```
+Pour la définition de l'argument S, on lui permet de supprimer une VM mais avant de la supprimer, on demade confirmation pour éviter les erreurs. 
+
+#### Argument D : Démarrer une VM 
+
+```
+if /i "%~1"=="D" (
+    if "%VM_NAME%"=="" (
+        echo Vous devez spécifier un nom de VM avec l'argument D.
+        exit /b 1
+    )
+    echo Démarrage de la machine %VM_NAME%...
+    VBoxManage startvm "%VM_NAME%" --type headless
+)
+```
+On défini l'argument D, elle permet seulement de démarrer une VM.
+
+#### Argument A : L'arrét d'une VM 
+
+```
+if /i "%~1"=="A" (
+    if "%VM_NAME%"=="" (
+        echo Vous devez spécifier un nom de VM avec l'argument S.
+        exit /b 1
+    )
+    :check_response2
+    set /p "response=Voulez-vous vraiment arrêter la VM %VM_NAME% ? (Oui/Non) : "
+
+    REM Convertir la réponse en majuscules pour comparaison facile
+    if /i "%response%"=="Oui" (
+        if "%VM_NAME%"=="" (
+            echo Vous devez spécifier un nom de VM avec l'argument A.
+            exit /b 1
+        )
+        echo Arrêt de la machine %VM_NAME%...
+        VBoxManage controlvm %VM_NAME% poweroff
+        echo La machine %VM_NAME% a été arrêtée !
+        exit /b 0
+    ) else if /i "%response%"=="Non" (
+        echo Annulation de l'arrêt de la VM %VM_NAME%.
+        exit /b 0
+    ) else (
+        echo Réponse non valide. Veuillez entrer Oui ou Non.
+        goto check_response2
+    )
+)
+```
+On reprend la base de l'argument S puis on la modifie pour que cet dernière puisse arrêter une VM et demander la confirmation à l'utilisateur. 
+
+#### Fin du programme 
+```
+pause
+```
+On rajoute, une pause afin que l'utilisateur puisse regarder ce qui à était générer. 
