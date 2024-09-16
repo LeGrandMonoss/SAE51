@@ -46,16 +46,49 @@ setlocal enabledelayedexpansion
 REM On force l'encodage en UTF-8 pour éviter les problèmes de caractères spéciaux
 chcp 65001 >nul
 ```
+Dans les premières lignes, nous avons préparer notre code en le rendant plus lisible et plus agréable à utiliser avec les lignes ci-dessus. echo off va nous permettre de désactiver l'affichage des lignes de commande pour avoir un environement plus clair. On utilise setlocal afin de manipuler plus efficacement les variables dans les boucles ou dans des conditions complexes. Vu sue le texte qu'on affiche est en français, on doit activer l'affichage en utf-8 pour bien afficher les caractères spéciaux, pour cela, on a utilisé la commande chcp qui permet de changer la table de caractère par celui-ci.
 
+#### Vérification du 1er argument
+```
+REM Vérification si le premier argument n'est pas valide
+if /i not "%~1"=="L" if /i not "%~1"=="N" if /i not "%~1"=="S" if /i not "%~1"=="D" if /i not "%~1"=="A" if /i not "%~1"=="M" (
+    echo Erreur : Argument non valide "%~1". Veuillez entrer une des options suivantes :
+    echo L  - Lister les machines
+    echo N  - Créer une nouvelle machine
+    echo S  - Supprimer une machine
+    echo D  - Démarrer une machine
+    echo A  - Arrêter une machine
+    echo M  - Créer plusieurs machines (8 max)
+    exit /b 1
+)
+```
 
 #### Initialisation des variables globales
 ```
-REM Définition des variables 
-set "RAMSize=4096"
-set "DiskSize=64"
-
+REM Définir les variables globales
+set "VM_NAME=%~2"
+set "VM_TYPE=Debian_64"
+set "VM_PATH=D:\RT\RT1\SAE21 Kramm"
 set "VBoxManagePath=C:\Program Files\Oracle\VirtualBox"
 set "PATH=%PATH%;%VBoxManagePath%"
+```
+On défini les variables qui seront utille pour les différentes fonctionnalités du script, la variable VM_PATH est à absolument changer le repertoire dans lequel les disques de stockages des VM vont être enregistré.
+On prend le temps d'ajouter VBoxManage dans le PATH pour ne pas avoir de problème lors de la première utilisation du script.
+
+```
+REM Vérifier et définir la RAM
+if "%~3" NEQ "" (
+    set "VM_RAM=%~3"
+) else (
+    set "VM_RAM=4096"
+)
+
+REM Vérifier et définir le disque dur
+if "%~4" NEQ "" (
+    set "VM_DU=%~4"
+) else (
+    set "VM_DU=65536"
+)
 ```
 Danx cette première partie on initialise des variables qui nous seront utile plus tard.  
 ```
@@ -234,9 +267,7 @@ MOREL Robin
 ### Ce qui à était fait :
 
 
-Dans les premières lignes, nous avons préparer notre code en le rendant plus lisible et plus agréable à utiliser avec les lignes ci-dessus. echo off va nous permettre de désactiver l'affichage des lignes de commande pour avoir un environement plus clair. On utilise setlocal afin de manipuler plus efficacement les variables dans les boucles ou dans des conditions complexes. Vu sue le texte qu'on affiche est en français, on doit activer l'affichage en utf-8 pour bien afficher les caractères spéciaux, pour cela, on a utilisé la commande chcp qui permet de changer la page de code utilisée dans l'invite de commande, afin d'utiliser utf-8.
 
-#### Vérification des arguments 
 
 ```
 REM Vérifier les arguments
