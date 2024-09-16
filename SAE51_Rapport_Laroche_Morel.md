@@ -13,35 +13,42 @@ MOREL Robin
 
 ### Objectif :
 
-Lors de ce projet nous avons du mettre en place un script permettant via VboxManage de créer des machines virtuelles, les démarer, les supprimer, les lister, les éteindre, ...
+Lors de ce projet, nous avons dû mettre en place un script permettant, via VboxManage, de créer des machines virtuelles, de les démarrer, les supprimer, les lister, les éteindre, ainsi que d'ajouter des fonctionnalités non intégrées précédemment. Nous avons choisi de recommencer le projet à zéro afin de nous replonger dedans et de corriger éventuellement des erreurs.
 
+---
+
+### Idées d'ajout :
+
+- Ajout d'un choix d'os qui ajoute directement l'iso correspondant
+  - Problème: Lors du projet nous avons paramétré pour que les vm se lancent en pxe donc cette solution n'a pas d'intérêt
+
+- Ajout d'une interface graphique
+  - Problème : Le projet avait pour but de se débarrasser de l'interface graphique de Virtual Box pour gagner du temps, mais si on veut absolument utiliser une interface graphique autant utiliser directement Virtual Box
+
+- Ajout de l'allocation de ressource dans les arguments pour pouvoir allouer plus ou moins de ressources si nécessaire, tout en gardant la RAM à 4096 o et le stockage à 64 Go si les arguments restent vides
+
+- Ajout d'un message de confirmation de suppression et un message de confirmation d'arrêt d'une VM
+
+- Ajout d'un argument de création multiple de VM
+  
 ---
 
 ### Présentation du code
 
-Pour chaque version, on a ajouté une ligne qui précise le chemin vers vboxmanage
-```
-set PATH=%PATH%;"C:\Program Files\Oracle\VirtualBox"
-```
-  
-Pour commencer, on a fait un code qui permettait de créer une machine avec un nom fixe à l'execution du script : 
-```
-VBoxManage createvm --name "Michel1" --register
-```
+Dans cette partie on va présenter le code que nous avons refait de 0, sans prendre en compte notre précédent rendu.
 
-Ensuite on a fait évoluer ce script pour créer une vm avec une ram précise et préciser l'os : 
 
+##### Mise en place du code
 ```
-set PATH=%PATH%;"C:\Program Files\Oracle\VirtualBox"
-VBoxManage createvm --name "Michel1" --register
-VBoxManage modifyvm Michel --os-type=Debian_64 --memory=4096
+@echo off  
+setlocal enabledelayedexpansion         
+
+REM On force l'encodage en UTF-8 pour éviter les problèmes de caractères spéciaux
+chcp 65001 >nul
 ```
 
 
-Après plusieurs étapes on a fini avec code rendu avec ce fichier.   
-
-On va donc expliquer chaque partie.
-
+#### Initialisation des variables globales
 ```
 REM Définition des variables 
 set "RAMSize=4096"
@@ -221,34 +228,13 @@ MOREL Robin
 
 ---
 
-### Objectif :
 
-Lors de ce projet, nous avons dû mettre en place un script permettant, via VboxManage, de créer des machines virtuelles, de les démarrer, les supprimer, les lister, les éteindre, ainsi que d'ajouter des fonctionnalités non intégrées précédemment. Nous avons choisi de recommencer le projet à zéro afin de nous replonger dedans et de corriger éventuellement des erreurs.
-
-### Idées d'ajout :
-
-- Ajout d'un choix d'os qui ajoute directement l'iso correspondant
-  - Problème: Lors du projet nous avons paramétré pour que les vm se lancent en pxe donc cette solution n'a pas d'intérêt
-
-- Ajout d'une interface graphique
-  - Problème : Le projet avait pour but de se débarrasser de l'interface graphique de Virtual Box pour gagner du temps, mais si on veut absolument utiliser une interface graphique autant utiliser directement Virtual Box
-
-- Ajout de l'allocation de ressource dans les arguments pour pouvoir allouer plus ou moins de ressources si nécessaire, tout en gardant la RAM à 4096 o et le stockage à 64 Go si les arguments restent vides
-
-- Rajouter une vérification pour supprimation une VM (voir aussi plus tard pour demander lors de l'arrêt d'une VM)
 
 
 ### Ce qui à était fait :
 
-##### Mise en place du code
-```
-@echo off  
-setlocal enabledelayedexpansion         
 
-REM On force l'encodage en UTF-8 pour éviter les problèmes de caractères spéciaux
-chcp 65001 >nul
-```
-Dans les premières lignes, nous avons préparer notre code en le rendant plus lisible et plus agréable à utiliser avec les lignes ci-dessus. echo off va nous permettre de désactiver l'affichhge des lignes de commande pour avoir un environement plus clair. On utilise setlocal afin de manipuler plus efficacement les variables dans les boucles ou dans des conditions complexes. Vu que plustard nous utilisions du français dans des messages des retours et qui à des caractères spéciaux, on va utiliser la commande chcp qui permet de changer la page de code utilisée dans l'invite de commande, afin d'utiliser utf-8.
+Dans les premières lignes, nous avons préparer notre code en le rendant plus lisible et plus agréable à utiliser avec les lignes ci-dessus. echo off va nous permettre de désactiver l'affichage des lignes de commande pour avoir un environement plus clair. On utilise setlocal afin de manipuler plus efficacement les variables dans les boucles ou dans des conditions complexes. Vu sue le texte qu'on affiche est en français, on doit activer l'affichage en utf-8 pour bien afficher les caractères spéciaux, pour cela, on a utilisé la commande chcp qui permet de changer la page de code utilisée dans l'invite de commande, afin d'utiliser utf-8.
 
 #### Vérification des arguments 
 
