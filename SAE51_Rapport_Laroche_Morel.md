@@ -73,7 +73,9 @@ if /i not "%~1"=="L" if /i not "%~1"=="N" if /i not "%~1"=="S" if /i not "%~1"==
     exit /b 1
 )
 ```
+
 On vérifie si la valeur du 1er argument est comprise dans les choix disponibles, si elle n'en fait pas partie, la liste des fonctionnalités sera affichée.
+
 ----------
 #### Initialisation des variables globales
 ```
