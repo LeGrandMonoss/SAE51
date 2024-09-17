@@ -52,6 +52,7 @@ chcp 65001 >nul
 Dans les premières lignes, nous avons préparer notre code en le rendant plus lisible et plus agréable à utiliser avec les lignes ci-dessus. echo off va nous permettre de désactiver l'affichage des lignes de commande pour avoir un environement plus clair. On utilise setlocal afin de manipuler plus efficacement les variables dans les boucles ou dans des conditions complexes. Vu que le texte qu'on affiche est en français, on doit activer l'affichage en utf-8 pour bien afficher les caractères spéciaux, pour cela, on a utilisé la commande chcp qui permet de changer la table de caractère par celui-ci.
 
 ----------
+
 ### Vérification du 1er argument
 ```
 REM Vérifier les arguments
@@ -226,7 +227,8 @@ if /i "%~1"=="N" (
 
 ```
 Dans cette étape, on vérifie si un deuxième argument existe pour définir le nom de la VM, on vérifie ensuite si le nom de la machine existe déjà et on supprime la machine existante si c'est le cas, et ensuite on créé la VM, on lui défini la mémoire vive (argument 3), on crée un disque dur (argument 4) qu'on attache au port virtuel sata de la machine et on active le boot prioritaire sur le réseau pour le Pxe.  
-On y ajoute le nom de la personne qui a créé la VM et la date et l'heure de création dans les métadonnées.  
+On y ajoute le nom de la personne qui a créé la VM et la date et l'heure de création dans les métadonnées.
+
 ----------
 
 #### Supprimer une machine
@@ -310,7 +312,80 @@ if /i "%~1"=="A" (
 On reprend la base de l'argument S puis on la modifie pour que cet dernière puisse arrêter une VM et demander la confirmation à l'utilisateur. 
 
 ---------- 
-___
+### Création multiple
+
+Voici l'ajout le plus visible au sujet, il permet de créer plusieurs VM en renseignant après la commande le nombre de machine à faire.
+Pour cela, on a pris la base de la création de la VM, qu'on a mis dans une boucle. Pour y arriver, on a concatené le numéro de la boucle au nom de la VM défini sur la commande de base.
+```
+if /i "%~1"=="M" (
+    if "%VM_NAME%"=="" (
+        echo Vous devez spécifier un nom de VM avec l'argument N.
+        exit /b 1
+    )
+    set "%VM_NAME%=%~2"
+    REM Vérifier si une VM avec le même nom existe déjà
+    VBoxManage showvminfo "%VM_NAME%" >nul 2>&1
+    if %errorlevel% == 0 (
+        echo La VM %VM_NAME% existe déjà. Suppression en cours...
+        VBoxManage unregistervm "%VM_NAME%" --delete
+        echo La VM %VM_NAME% a été supprimée !
+    ) else (
+        echo Aucune VM nommée %VM_NAME%.
+    )
+    set z=1
+    set /p nb="Combien voulez-vous de VM? "
+    :bclmachine
+    set "VM_Namenb=%VM_NAME%%z%"
+    
+     REM Vérifier si une VM avec le même nom existe déjà
+    VBoxManage showvminfo "%VM_Namenb%" >nul 2>&1
+    if %errorlevel% == 0 (
+        echo La VM %VM_Namenb% existe déjà. Suppression en cours...
+        VBoxManage unregistervm "%VM_Namenb%" --delete
+        echo La VM %VM_Namenb% a été supprimée !
+    ) else (
+        echo Aucune VM nommée %VM_Namenb%.
+    )
+    REM Créer la VM
+    VBoxManage createvm --name "%VM_Namenb%" --ostype "%VM_TYPE%" --basefolder "%VM_PATH%" --register
+    echo La VM %VM_Namenb% a été créée dans %VM_PATH% !
+
+    REM Configurer la RAM
+    VBoxManage modifyvm "%VM_Namenb%" --memory %VM_RAM%
+    echo La RAM de la VM %VM_Namenb% a été configurée !
+
+    REM Créer le disque dur virtuel dans un chemin spécifique
+    VBoxManage createmedium disk --filename "%VM_PATH%\%VM_Namenb%\%VM_Namenb%.vdi" --size %VM_DU% --format VDI
+    echo Le disque dur pour la VM %VM_Namenb% a été créé !
+
+    REM Ajouter un contrôleur SATA à la VM
+    VBoxManage storagectl "%VM_Namenb%" --name "SATA Controller" --add sata --controller IntelAhci
+
+    REM Attacher le disque dur virtuel au port 0 du contrôleur SATA
+    VBoxManage storageattach "%VM_Namenb%" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "%VM_PATH%\%VM_Namenb%\%VM_Namenb%.vdi"
+    echo Le disque dur pour la VM %VM_Namenb% a été attaché !
+
+    REM Configurer le réseau en NAT
+    VBoxManage modifyvm "%VM_Namenb%" --nic1 nat
+    echo Le réseau de la VM %VM_Namenb% a été configuré !
+
+    REM Configurer pour booter sur le réseau (PXE)
+    VBoxManage modifyvm "%VM_Namenb%" --boot1 net
+    echo La VM %VM_Namenb% est configurée pour démarrer sur le réseau !
+
+    REM Créer le fichier de métadonnées
+    mkdir "%VM_PATH%\%VM_Namenb%"
+    echo Date de création : %CREATION_DATE% > "%VM_PATH%\%VM_Namenb%\metadata.txt"
+    echo Créée par : %USER% >> "%VM_PATH%\%VM_Namenb%\metadata.txt"
+    echo Les métadonnées pour la VM %VM_Namenb% ont été enregistrées !
+    if "%z%" LEQ "%nb%" (
+        set /a z=z+1
+        echo %z%
+        goto bclmachine
+    )
+)
+```
+
 ----------
 ### Fin du programme 
 ```
@@ -331,5 +406,13 @@ VBoxManage controlvm "%VMName%" acpipowerbutton
 ```
 Pour éteindre de manière plus sécuriser la machine, mais lors des test la commande n'a pas fonctionné.
 
+#### Boucle infinie sur la création multiple
 
+- Lors de la création multiple si on veut ajouter 9 VM la boucle se met à tourner à l'infini et donc créé des machines jusqu'à ce qu'on fasse ctrl+C.
+- Mais ce n'est pas le seul problème avec cette boucle, lorsqu'on met un nombre au-dessus de 9 on se retrouve qu'avec 2 machines à la sortie.
+Avec un peu plus de temps pour debugger, on aurait pu corriger ces deux problèmes.
 
+#### Confirmation un peu trop performante
+
+Lors de la confirmation de suppression, on se retrouve avec un problème d'argument vide lors de la première execution de la boucle permettant de décider du sort de la VM. Ce qui en résulte à un "Non" qui relance la boucle.
+Ce bug n'est pas si dérangeant donc on a pas mis de ressources dessus pour le corriger en priorité.
