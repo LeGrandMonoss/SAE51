@@ -10,11 +10,13 @@ MOREL Robin
 **Date de remise : 22/06/2023**
 
 ---
+---
 
 ## Objectif :
 
 Lors de ce projet, nous avons dû mettre en place un script permettant, via VboxManage, de créer des machines virtuelles, de les démarrer, les supprimer, les lister, les éteindre, ainsi que d'ajouter des fonctionnalités non intégrées précédemment. Nous avons choisi de recommencer le projet à zéro afin de nous replonger dedans et de corriger éventuellement des erreurs.
 
+---
 ---
 
 ## Idées d'ajout :
@@ -32,13 +34,14 @@ Lors de ce projet, nous avons dû mettre en place un script permettant, via Vbox
 - Ajout d'un argument de création multiple de VM
   
 ---
+---
 
 ## Présentation du code
 
 Dans cette partie on va présenter le code que nous avons refait de 0, sans prendre en compte notre précédent rendu.
 
 
-##### Mise en place du code
+### Mise en place du code
 ```
 @echo off  
 setlocal enabledelayedexpansion         
@@ -49,7 +52,7 @@ chcp 65001 >nul
 Dans les premières lignes, nous avons préparer notre code en le rendant plus lisible et plus agréable à utiliser avec les lignes ci-dessus. echo off va nous permettre de désactiver l'affichage des lignes de commande pour avoir un environement plus clair. On utilise setlocal afin de manipuler plus efficacement les variables dans les boucles ou dans des conditions complexes. Vu que le texte qu'on affiche est en français, on doit activer l'affichage en utf-8 pour bien afficher les caractères spéciaux, pour cela, on a utilisé la commande chcp qui permet de changer la table de caractère par celui-ci.
 
 ----------
-#### Vérification du 1er argument
+### Vérification du 1er argument
 ```
 REM Vérifier les arguments
 if "%~1"=="" (
@@ -75,9 +78,11 @@ if /i not "%~1"=="L" if /i not "%~1"=="N" if /i not "%~1"=="S" if /i not "%~1"==
 )
 ```
 
-##### On vérifie si la valeur du 1er argument est comprise dans les choix disponibles, si elle n'en fait pas partie, la liste des fonctionnalités sera affichée.
+On vérifie si la valeur du 1er argument est comprise dans les choix disponibles, si elle n'en fait pas partie, la liste des fonctionnalités sera affichée.
+
 ----------
-#### Initialisation des variables globales
+
+### Initialisation des variables globales
 ```
 REM Définir les variables globales
 set "VM_NAME=%~2"
@@ -87,9 +92,11 @@ set "VBoxManagePath=C:\Program Files\Oracle\VirtualBox"
 set "PATH=%PATH%;%VBoxManagePath%"
 ```
 
-##### On défini les variables qui seront utille pour les différentes fonctionnalités du script, la variable VM_PATH est à absolument changer le repertoire dans lequel les disques de stockages des VM vont être enregistré.
-##### On prend le temps d'ajouter VBoxManage dans le PATH pour ne pas avoir de problème lors de la première utilisation du script.
+On défini les variables qui seront utille pour les différentes fonctionnalités du script, la variable VM_PATH est à absolument changer le repertoire dans lequel les disques de stockages des VM vont être enregistré.
+ On prend le temps d'ajouter VBoxManage dans le PATH pour ne pas avoir de problème lors de la première utilisation du script.
+
 ----------
+
 ```
 REM Vérifier et définir la RAM
 if "%~3" NEQ "" (
@@ -105,8 +112,10 @@ if "%~4" NEQ "" (
     set "VM_DU=65536"
 )
 ```
-##### Dans cette partie on vérifie les arguments 3 et 4, qui correspondent aux variables allouant les ressources en terme de mémoire, si aucun argument n'est écrit, une valeur de base est est attribuée à 4Go pour la RAM et 64Go pour le stockage.  
+Dans cette partie on vérifie les arguments 3 et 4, qui correspondent aux variables allouant les ressources en terme de mémoire, si aucun argument n'est écrit, une valeur de base est est attribuée à 4Go pour la RAM et 64Go pour le stockage.  
+
 ----------
+
 ```
 REM Obtenir l'utilisateur et la date de création
 set "USER=%USERNAME%"
