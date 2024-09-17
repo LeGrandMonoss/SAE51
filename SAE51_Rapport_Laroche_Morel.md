@@ -114,7 +114,7 @@ for /f "tokens=1-3 delims=/ " %%a in ("%DATE%") do (
 ```
 ---
 
------
+--------
 ---
 Enfin, on initialise les variables des métadonnées qu'on veut attribuer aux VM.
 ```
