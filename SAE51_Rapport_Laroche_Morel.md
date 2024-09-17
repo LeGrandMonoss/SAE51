@@ -87,7 +87,7 @@ set "VBoxManagePath=C:\Program Files\Oracle\VirtualBox"
 set "PATH=%PATH%;%VBoxManagePath%"
 ```
 
-On défini les variables qui seront utille pour les différentes fonctionnalités du script, la variable VM_PATH est à absolument changer le repertoire dans lequel les disques de stockages des VM vont être enregistré.
+##### On défini les variables qui seront utille pour les différentes fonctionnalités du script, la variable VM_PATH est à absolument changer le repertoire dans lequel les disques de stockages des VM vont être enregistré.
 On prend le temps d'ajouter VBoxManage dans le PATH pour ne pas avoir de problème lors de la première utilisation du script.
 ----------
 ```
