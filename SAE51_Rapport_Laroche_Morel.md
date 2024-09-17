@@ -1,7 +1,7 @@
 # SAE51 - Création de machines virtuelles
 
 
-----------
+
 ## Réalisé par :
 LAROCHE Léo  
 MOREL Robin  
@@ -74,7 +74,7 @@ if /i not "%~1"=="L" if /i not "%~1"=="N" if /i not "%~1"=="S" if /i not "%~1"==
 )
 ```
 On vérifie si la valeur du 1er argument est comprise dans les choix disponibles, si elle n'en fait pas partie, la liste des fonctionnalités sera affichée.
-
+----------
 #### Initialisation des variables globales
 ```
 REM Définir les variables globales
@@ -86,7 +86,7 @@ set "PATH=%PATH%;%VBoxManagePath%"
 ```
 On défini les variables qui seront utille pour les différentes fonctionnalités du script, la variable VM_PATH est à absolument changer le repertoire dans lequel les disques de stockages des VM vont être enregistré.
 On prend le temps d'ajouter VBoxManage dans le PATH pour ne pas avoir de problème lors de la première utilisation du script.
-
+----------
 ```
 REM Vérifier et définir la RAM
 if "%~3" NEQ "" (
@@ -103,6 +103,7 @@ if "%~4" NEQ "" (
 )
 ```
 Dans cette partie on vérifie les arguments 3 et 4, qui correspondent aux variables allouant les ressources en terme de mémoire, si aucun argument n'est écrit, une valeur de base est est attribuée à 4Go pour la RAM et 64Go pour le stockage.  
+----------
 ```
 REM Obtenir l'utilisateur et la date de création
 set "USER=%USERNAME%"
@@ -112,10 +113,7 @@ for /f "tokens=1-3 delims=/ " %%a in ("%DATE%") do (
 
 
 ```
----
 
---------
----
 Enfin, on initialise les variables des métadonnées qu'on veut attribuer aux VM.
 ```
 
