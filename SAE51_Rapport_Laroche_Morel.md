@@ -46,8 +46,8 @@ setlocal enabledelayedexpansion
 REM On force l'encodage en UTF-8 pour éviter les problèmes de caractères spéciaux
 chcp 65001 >nul
 ```
-Dans les premières lignes, nous avons préparer notre code en le rendant plus lisible et plus agréable à utiliser avec les lignes ci-dessus. echo off va nous permettre de désactiver l'affichage des lignes de commande pour avoir un environement plus clair. On utilise setlocal afin de manipuler plus efficacement les variables dans les boucles ou dans des conditions complexes. Vu que le texte qu'on affiche est en français, on doit activer l'affichage en utf-8 pour bien afficher les caractères spéciaux, pour cela, on a utilisé la commande chcp qui permet de changer la table de caractère par celui-ci.
-
+##### Dans les premières lignes, nous avons préparer notre code en le rendant plus lisible et plus agréable à utiliser avec les lignes ci-dessus. echo off va nous permettre de désactiver l'affichage des lignes de commande pour avoir un environement plus clair. On utilise setlocal afin de manipuler plus efficacement les variables dans les boucles ou dans des conditions complexes. Vu que le texte qu'on affiche est en français, on doit activer l'affichage en utf-8 pour bien afficher les caractères spéciaux, pour cela, on a utilisé la commande chcp qui permet de changer la table de caractère par celui-ci.
+----------
 #### Vérification du 1er argument
 ```
 REM Vérifier les arguments
