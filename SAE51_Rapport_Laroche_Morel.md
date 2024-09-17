@@ -11,13 +11,13 @@ MOREL Robin
 
 ---
 
-### Objectif :
+## Objectif :
 
 Lors de ce projet, nous avons dû mettre en place un script permettant, via VboxManage, de créer des machines virtuelles, de les démarrer, les supprimer, les lister, les éteindre, ainsi que d'ajouter des fonctionnalités non intégrées précédemment. Nous avons choisi de recommencer le projet à zéro afin de nous replonger dedans et de corriger éventuellement des erreurs.
 
 ---
 
-### Idées d'ajout :
+## Idées d'ajout :
 
 - Ajout d'un choix d'os qui ajoute directement l'iso correspondant
   - Problème: Lors du projet nous avons paramétré pour que les vm se lancent en pxe donc cette solution n'a pas d'intérêt
@@ -33,7 +33,7 @@ Lors de ce projet, nous avons dû mettre en place un script permettant, via Vbox
   
 ---
 
-### Présentation du code
+## Présentation du code
 
 Dans cette partie on va présenter le code que nous avons refait de 0, sans prendre en compte notre précédent rendu.
 
@@ -74,8 +74,7 @@ if /i not "%~1"=="L" if /i not "%~1"=="N" if /i not "%~1"=="S" if /i not "%~1"==
 )
 ```
 
-On vérifie si la valeur du 1er argument est comprise dans les choix disponibles, si elle n'en fait pas partie, la liste des fonctionnalités sera affichée.
-
+##### On vérifie si la valeur du 1er argument est comprise dans les choix disponibles, si elle n'en fait pas partie, la liste des fonctionnalités sera affichée.
 ----------
 #### Initialisation des variables globales
 ```
@@ -88,7 +87,7 @@ set "PATH=%PATH%;%VBoxManagePath%"
 ```
 
 ##### On défini les variables qui seront utille pour les différentes fonctionnalités du script, la variable VM_PATH est à absolument changer le repertoire dans lequel les disques de stockages des VM vont être enregistré.
-On prend le temps d'ajouter VBoxManage dans le PATH pour ne pas avoir de problème lors de la première utilisation du script.
+##### On prend le temps d'ajouter VBoxManage dans le PATH pour ne pas avoir de problème lors de la première utilisation du script.
 ----------
 ```
 REM Vérifier et définir la RAM
@@ -105,7 +104,7 @@ if "%~4" NEQ "" (
     set "VM_DU=65536"
 )
 ```
-Dans cette partie on vérifie les arguments 3 et 4, qui correspondent aux variables allouant les ressources en terme de mémoire, si aucun argument n'est écrit, une valeur de base est est attribuée à 4Go pour la RAM et 64Go pour le stockage.  
+##### Dans cette partie on vérifie les arguments 3 et 4, qui correspondent aux variables allouant les ressources en terme de mémoire, si aucun argument n'est écrit, une valeur de base est est attribuée à 4Go pour la RAM et 64Go pour le stockage.  
 ----------
 ```
 REM Obtenir l'utilisateur et la date de création
@@ -118,11 +117,11 @@ for /f "tokens=1-3 delims=/ " %%a in ("%DATE%") do (
 ```
 
 Enfin, on initialise les variables des métadonnées qu'on veut attribuer aux VM.
-```
 
-```
-#### Présentation des fonctionnalités 
-##### Lister les machines
+---
+
+### Présentation des fonctionnalités 
+#### Lister les machines
 ```
 set "Action=%~1"
 if /i "%Action%"=="L" (
