@@ -391,7 +391,10 @@ if /i "%~1"=="M" (
 ```
 pause
 ```
-On rajoute, une pause afin que l'utilisateur puisse regarder ce qui à était générer. 
+On rajoute, une pause afin que l'utilisateur puisse regarder ce qui a été généré. 
+
+---
+---
 
 ### Problèmes et Améliorations possibles
 
