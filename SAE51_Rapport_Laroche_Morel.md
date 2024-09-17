@@ -50,6 +50,17 @@ Dans les premières lignes, nous avons préparer notre code en le rendant plus l
 
 #### Vérification du 1er argument
 ```
+REM Vérifier les arguments
+if "%~1"=="" (
+    echo Usage: %0 [L|N|S|D|A|M] [nom_VM]
+    echo L  - Lister les machines
+    echo N  - Créer une nouvelle machine
+    echo S  - Supprimer une machine
+    echo D  - Démarrer une machine
+    echo A  - Arrêter une machine
+    echo M  - Créer plusieurs machines (8 max)
+    exit /b 
+)
 REM Vérification si le premier argument n'est pas valide
 if /i not "%~1"=="L" if /i not "%~1"=="N" if /i not "%~1"=="S" if /i not "%~1"=="D" if /i not "%~1"=="A" if /i not "%~1"=="M" (
     echo Erreur : Argument non valide "%~1". Veuillez entrer une des options suivantes :
@@ -62,6 +73,7 @@ if /i not "%~1"=="L" if /i not "%~1"=="N" if /i not "%~1"=="S" if /i not "%~1"==
     exit /b 1
 )
 ```
+On vérifie si la valeur du 1er argument est comprise dans les choix disponibles, si elle n'en fait pas partie, la liste des fonctionnalités sera affichée.
 
 #### Initialisation des variables globales
 ```
