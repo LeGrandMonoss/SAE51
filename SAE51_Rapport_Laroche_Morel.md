@@ -310,11 +310,15 @@ if /i "%~1"=="A" (
 On reprend la base de l'argument S puis on la modifie pour que cet dernière puisse arrêter une VM et demander la confirmation à l'utilisateur. 
 
 ---------- 
+___
+----------
+### Fin du programme 
+```
+pause
+```
+On rajoute, une pause afin que l'utilisateur puisse regarder ce qui à était générer. 
 
 ### Problèmes et Améliorations possibles
-
-#### Problème argument
-Lors des tests une désynchronisation des arguments (Apparition d'arguments précèdents lors de l'execution d'une nouvelle commande) est apparue, je n'ai néanmoins pas trouvé d'où vennait ce problème.  
 
 #### Poweroff
 Certaines partie du code pourrait être améliorer par exemple sur la fonction pour arrêter une VM le : 
@@ -327,62 +331,5 @@ VBoxManage controlvm "%VMName%" acpipowerbutton
 ```
 Pour éteindre de manière plus sécuriser la machine, mais lors des test la commande n'a pas fonctionné.
 
-# SAE51 - Ajout de fonctionnalités
-
-## Réalisé par :
-LAROCHE Léo  
-MOREL Robin  
 
 
-**Date de remise : XX/XX/20XX**
-
----
-
-
-
-
-
-
-
-#### Argument S : suppresion de VM 
-
-```
-if /i "%~1"=="S" (
-    if "%VM_NAME%"=="" (
-        echo Vous devez spécifier un nom de VM avec l'argument S.
-        exit /b 1
-    )
-    :check_response
-    set /p "response=Voulez-vous vraiment supprimer la VM %VM_NAME% ? (Oui/Non) : "
-
-    REM Convertir la réponse en majuscules pour comparaison facile
-    if /i "%response%"=="Oui" (
-        if "%VM_NAME%"=="" (
-            echo Vous devez spécifier un nom de VM avec l'argument S.
-            exit /b 1
-        )
-        echo Suppression de la machine %VM_NAME%...
-        VBoxManage unregistervm %VM_NAME% --delete
-        echo La machine %VM_NAME% a été supprimée !
-        exit /b 0
-    ) else if /i "%response%"=="Non" (
-        echo Annulation de la suppression de la VM %VM_NAME%.
-        exit /b 0
-    ) else (
-        echo Réponse non valide. Veuillez entrer Oui ou Non.
-        goto check_response
-    )
-)
-```
-Pour la définition de l'argument S, on lui permet de supprimer une VM mais avant de la supprimer, on demade confirmation pour éviter les erreurs. 
-
-#### Argument D : Démarrer une VM
-
-#### Argument A : L'arrét d'une VM 
-
-
-#### Fin du programme 
-```
-pause
-```
-On rajoute, une pause afin que l'utilisateur puisse regarder ce qui à était générer. 
