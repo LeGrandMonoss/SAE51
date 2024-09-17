@@ -175,42 +175,62 @@ Ici, on défini l'argument L qui permettra de lister les VMs qu'on a créé et d
 
 #### Ajouter une machine
 ```
-else if /i "%Action%"=="N" (
-    REM Vérification du deuxième argument
-    if "%~2"=="" (
-        echo Le nom de la machine doit être spécifié en tant que deuxième argument.
+if /i "%~1"=="N" (
+    if "%VM_NAME%"=="" (
+        echo Vous devez spécifier un nom de VM avec l'argument N.
         exit /b 1
     )
-    set "VMName=%~2"
-    
-    REM Vérifier si une machine de même nom existe déjà
-    VBoxManage showvminfo "%VMName%" >nul 2>&1
-    if %errorlevel% equ 0 (
-        echo Une machine avec le nom %VMName% existe déjà.
-        exit /b 1
+    REM Vérifier si une VM avec le même nom existe déjà
+    VBoxManage showvminfo "%VM_NAME%" >nul 2>&1
+    if %errorlevel% == 0 (
+        echo La VM %VM_NAME% existe déjà. Suppression en cours...
+        VBoxManage unregistervm "%VM_NAME%" --delete
+        echo La VM %VM_NAME% a été supprimée !
+    ) else (
+        echo Aucune VM nommée %VM_NAME%.
     )
-    
-    REM Créer la machine virtuelle
-    VBoxManage createvm --name "%VMName%" --ostype Debian_64 --register
-    
-    REM Configurer les ressources de la machine virtuelle
-    VBoxManage modifyvm "%VMName%" --memory %RAMSize% --vram 128
-    VBoxManage createmedium disk --filename "D:\RT\SAE21 Kramm\Disques\%VMName%.vdi" --size %DiskSize% --format VDI
-    VBoxManage storagectl "%VMName%" --name "SATA Controller" --add sata --bootable on
-    VBoxManage storageattach "%VMName%" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "D:\RT\SAE21 Kramm\Disques\%VMName%.vdi"
-    VBoxManage modifyvm "%VMName%" --nic1 intnet --nicbootprio1 1
-    
-    REM Ajouter les métadonnées
-    set "CreationDate=%DATE% %TIME%"
-    set "Username=%USERNAME%"
-    VBoxManage setextradata "%VMName%" "date_de_creation" "%CreationDate%"
-    VBoxManage setextradata "%VMName%" "utilisateur" "%Username%"
-)
-```
-Dans cette étape, on vérifie si un deuxième argument existe pour définir le nom de la VM, on vérifie ensuite si le nom de la machine existe déjà et on arrête de le programme si c'est le cas, et ensuite on créé la VM, on lui défini la mémoire vive, on crée un disque dur qu'on attache au port virtuel sata de la machine et on active le boot prioritaire sur le réseau pour le Pxe.  
-On a aussi ajouté en métadonnée le nom de la personne qui a créé la VM et la date et l'heure de création.  
 
-##### Supprimer une machine
+    REM Créer la VM
+    VBoxManage createvm --name "%VM_NAME%" --ostype "%VM_TYPE%" --basefolder "%VM_PATH%" --register
+    echo La VM %VM_NAME% a été créée dans %VM_PATH% !
+
+    REM Configurer la RAM
+    VBoxManage modifyvm "%VM_NAME%" --memory %VM_RAM%
+    echo La RAM de la VM %VM_NAME% a été configurée !
+
+    REM Créer le disque dur virtuel dans un chemin spécifique
+    VBoxManage createmedium disk --filename "%VM_PATH%\%VM_NAME%\%VM_NAME%.vdi" --size %VM_DU% --format VDI
+    echo Le disque dur pour la VM %VM_NAME% a été créé !
+
+    REM Ajouter un contrôleur SATA à la VM
+    VBoxManage storagectl "%VM_NAME%" --name "SATA Controller" --add sata --controller IntelAhci
+
+    REM Attacher le disque dur virtuel au port 0 du contrôleur SATA
+    VBoxManage storageattach "%VM_NAME%" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium "%VM_PATH%\%VM_NAME%\%VM_NAME%.vdi"
+    echo Le disque dur pour la VM %VM_NAME% a été attaché !
+
+    REM Configurer le réseau en NAT
+    VBoxManage modifyvm "%VM_NAME%" --nic1 nat
+    echo Le réseau de la VM %VM_NAME% a été configuré !
+
+    REM Configurer pour booter sur le réseau (PXE)
+    VBoxManage modifyvm "%VM_NAME%" --boot1 net
+    echo La VM %VM_NAME% est configurée pour démarrer sur le réseau !
+
+    REM Créer le fichier de métadonnées
+    mkdir "%VM_PATH%\%VM_NAME%"
+    echo Date de création : %CREATION_DATE% > "%VM_PATH%\%VM_NAME%\metadata.txt"
+    echo Créée par : %USER% >> "%VM_PATH%\%VM_NAME%\metadata.txt"
+    echo Les métadonnées pour la VM %VM_NAME% ont été enregistrées !
+)
+
+```
+Dans cette étape, on vérifie si un deuxième argument existe pour définir le nom de la VM, on vérifie ensuite si le nom de la machine existe déjà et on supprime la machine existante si c'est le cas, et ensuite on créé la VM, on lui défini la mémoire vive (argument 3), on crée un disque dur (argument 4) qu'on attache au port virtuel sata de la machine et on active le boot prioritaire sur le réseau pour le Pxe.  
+On y ajoute le nom de la personne qui a créé la VM et la date et l'heure de création dans les métadonnées.  
+----------
+
+#### Supprimer une machine
+
 ```
 if /i "%~1"=="S" (
     if "%VM_NAME%"=="" (
@@ -241,52 +261,55 @@ if /i "%~1"=="S" (
 ```
 Cette partie gère la suppression de la VM, elle contient un message de confirmation pour empêcher de supprimer une machine par mégarde. 
 
-##### Démarrer une machine existante 
-```
-else if /i "%Action%"=="D" (
-    REM Vérification du deuxième argument
-    if "%~2"=="" (
-        echo Le nom de la machine doit être spécifié en tant que deuxième argument.
-        exit /b 1
-    )
-    set "VMName=%~2"
-    
-    REM Vérifier si la machine existe
-    VBoxManage showvminfo "%VMName%" >nul 2>&1
-    if %errorlevel% neq 0 (
-        echo La machine avec le nom %VMName% n'existe pas.
-        exit /b 1
-    )
-    
-    REM Démarrer la machine virtuelle
-    VBoxManage startvm "%VMName%"
-)
-```
-Pour démarrer la vm on vérifie que la machine existe et on la lance.
-##### Arrêter une machine
-```
-else if /i "%Action%"=="A" (
-    REM Vérification du deuxième argument
-    if "%~2"=="" (
-        echo Le nom de la machine doit être spécifié en tant que deuxième argument.
-        exit /b 1
-    )
-    set "VMName=%~2"
-    
-    REM Vérifier si la machine existe
-    VBoxManage showvminfo "%VMName%" >nul 2>&1
-    if %errorlevel% neq 0 (
-        echo La machine avec le nom %VMName% n'existe pas.
-        exit /b 1
-    )
-    
-    REM Arrêter la machine virtuelle
-    VBoxManage controlvm "%VMName%" poweroff
-)
-```
-Pour finir, on vérifie que la VM existe et on l'éteint.
+----------
 
---- 
+#### Démarrer une machine existante 
+```
+if /i "%~1"=="D" (
+    if "%VM_NAME%"=="" (
+        echo Vous devez spécifier un nom de VM avec l'argument D.
+        exit /b 1
+    )
+    echo Démarrage de la machine %VM_NAME%...
+    VBoxManage startvm "%VM_NAME%" --type headless
+)
+```
+On défini l'argument D, il permet seulement de démarrer une VM.
+
+----------
+
+#### Arrêter une machine
+```
+if /i "%~1"=="A" (
+    if "%VM_NAME%"=="" (
+        echo Vous devez spécifier un nom de VM avec l'argument S.
+        exit /b 1
+    )
+    :check_response2
+    set /p "response=Voulez-vous vraiment arrêter la VM %VM_NAME% ? (Oui/Non) : "
+
+    REM Convertir la réponse en majuscules pour comparaison facile
+    if /i "%response%"=="Oui" (
+        if "%VM_NAME%"=="" (
+            echo Vous devez spécifier un nom de VM avec l'argument A.
+            exit /b 1
+        )
+        echo Arrêt de la machine %VM_NAME%...
+        VBoxManage controlvm %VM_NAME% poweroff
+        echo La machine %VM_NAME% a été arrêtée !
+        exit /b 0
+    ) else if /i "%response%"=="Non" (
+        echo Annulation de l'arrêt de la VM %VM_NAME%.
+        exit /b 0
+    ) else (
+        echo Réponse non valide. Veuillez entrer Oui ou Non.
+        goto check_response2
+    )
+)
+```
+On reprend la base de l'argument S puis on la modifie pour que cet dernière puisse arrêter une VM et demander la confirmation à l'utilisateur. 
+
+---------- 
 
 ### Problèmes et Améliorations possibles
 
@@ -353,51 +376,10 @@ if /i "%~1"=="S" (
 ```
 Pour la définition de l'argument S, on lui permet de supprimer une VM mais avant de la supprimer, on demade confirmation pour éviter les erreurs. 
 
-#### Argument D : Démarrer une VM 
-
-```
-if /i "%~1"=="D" (
-    if "%VM_NAME%"=="" (
-        echo Vous devez spécifier un nom de VM avec l'argument D.
-        exit /b 1
-    )
-    echo Démarrage de la machine %VM_NAME%...
-    VBoxManage startvm "%VM_NAME%" --type headless
-)
-```
-On défini l'argument D, elle permet seulement de démarrer une VM.
+#### Argument D : Démarrer une VM
 
 #### Argument A : L'arrét d'une VM 
 
-```
-if /i "%~1"=="A" (
-    if "%VM_NAME%"=="" (
-        echo Vous devez spécifier un nom de VM avec l'argument S.
-        exit /b 1
-    )
-    :check_response2
-    set /p "response=Voulez-vous vraiment arrêter la VM %VM_NAME% ? (Oui/Non) : "
-
-    REM Convertir la réponse en majuscules pour comparaison facile
-    if /i "%response%"=="Oui" (
-        if "%VM_NAME%"=="" (
-            echo Vous devez spécifier un nom de VM avec l'argument A.
-            exit /b 1
-        )
-        echo Arrêt de la machine %VM_NAME%...
-        VBoxManage controlvm %VM_NAME% poweroff
-        echo La machine %VM_NAME% a été arrêtée !
-        exit /b 0
-    ) else if /i "%response%"=="Non" (
-        echo Annulation de l'arrêt de la VM %VM_NAME%.
-        exit /b 0
-    ) else (
-        echo Réponse non valide. Veuillez entrer Oui ou Non.
-        goto check_response2
-    )
-)
-```
-On reprend la base de l'argument S puis on la modifie pour que cet dernière puisse arrêter une VM et demander la confirmation à l'utilisateur. 
 
 #### Fin du programme 
 ```
