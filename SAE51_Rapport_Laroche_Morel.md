@@ -104,19 +104,22 @@ if "%~4" NEQ "" (
 ```
 Dans cette partie on vérifie les arguments 3 et 4, qui correspondent aux variables allouant les ressources en terme de mémoire, si aucun argument n'est écrit, une valeur de base est est attribuée à 4Go pour la RAM et 64Go pour le stockage.  
 ```
-if "%~1"=="" (
-    echo Utilisation: %~nx0 <action> [machine]
-    echo   Actions disponibles:
-    echo     L - Lister les machines enregistrées
-    echo     N - Ajouter une nouvelle machine
-    echo     S - Supprimer une machine
-    echo     D - Démarrer une machine
-    echo     A - Arrêter une machine
-    exit /b 1
+REM Obtenir l'utilisateur et la date de création
+set "USER=%USERNAME%"
+for /f "tokens=1-3 delims=/ " %%a in ("%DATE%") do (
+    set "CREATION_DATE=%%c-%%a-%%b"
 )
 
+
 ```
-Après ça on fait une condition "si" permettant d'affiché les différents arguments existant si la personne n'en rentre aucun.  
+---
+
+---
+---
+Enfin, on initialise les variables des métadonnées qu'on veut attribuer aux VM.
+```
+
+```
 #### Présentation des fonctionnalités 
 ##### Lister les machines
 ```
