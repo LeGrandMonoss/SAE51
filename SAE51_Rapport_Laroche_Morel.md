@@ -413,9 +413,9 @@ Pour éteindre de manière plus sécuriser la machine, mais lors des test la com
 
 - Lors de la création multiple si on veut ajouter **9** VM la boucle se met à tourner **à l'infini** et donc créé des machines jusqu'à ce qu'on fasse **ctrl+C**.
 - Mais ce n'est pas le seul problème avec cette boucle, lorsqu'on met un nombre au-dessus de **9** on se retrouve qu'avec 2 machines à la sortie.
-Avec un peu plus de temps pour debugger, on aurait pu corriger ces deux problèmes.
+  - Avec un peu plus de temps pour debugger, on aurait pu corriger ces deux problèmes.
 
 #### Confirmation un peu trop performante
 
-Lors de la confirmation de suppression, on se retrouve avec un problème d'argument vide lors de la première execution de la boucle permettant de décider du sort de la VM. Ce qui en résulte à un **"Non"** qui relance la boucle.
-Ce bug n'est pas si dérangeant donc on a pas mis de ressources dessus pour le corriger en priorité.
+- Lors de la confirmation de suppression, on se retrouve avec un problème d'argument vide lors de la première execution de la boucle permettant de décider du sort de la VM. Ce qui en résulte à un **"Non"** qui relance la boucle.
+  - Ce bug n'est pas si dérangeant donc on a pas mis de ressources dessus pour le corriger en priorité.
